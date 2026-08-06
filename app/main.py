@@ -1,15 +1,11 @@
 from fastapi import FastAPI
 from app.core.config import settings
+from app.api.v1.endpoints import auth
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
-)
+app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
 
-@app.get("/health", tags=["Health"])
+@app.get("/health", status_code=200)
 def health_check():
-    return {
-        "status": "healthy",
-        "project": settings.PROJECT_NAME,
-        "version": settings.VERSION
-    }
+    return {"status": "healthy", "service": settings.PROJECT_NAME}
+
+app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
