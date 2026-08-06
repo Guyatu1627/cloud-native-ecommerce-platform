@@ -5,6 +5,7 @@ from app.api.deps import get_db, get_current_user
 from app.db.models import User
 from app.schemas.product import ProductCreate, ProductResponse
 from app.crud import crud_product
+from app.schemas.product import ProductUpdate
 
 router = APIRouter()
 
@@ -36,3 +37,36 @@ def create_product(
 ):
     """Protected endpoint to create a new product item."""
     return crud_product.create_product(db=db, product_in=product_in)
+
+
+@router.put("/{product_id}", response_model=ProductResponse)
+def update_product(
+    product_id: int,
+    product_in: ProductUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Protected endpoint to update product details."""
+    product = crud_product.get_product(db, product_id=product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+    return crud_product.update_product(db=db, db_product=product, product_in=product_in)
+
+@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Protected endpoint to remove a product from inventory."""
+    product = crud_product.get_product(db, product_id=product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+    crud_product.delete_product(db=db, product_id=product_id)
+    return None
