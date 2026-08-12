@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cloud-native-ecommerce-api
+description: Helm chart for Cloud-Native E-Commerce API, PostgreSQL, and Redis stack
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

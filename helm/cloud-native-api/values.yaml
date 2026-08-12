@@ -1,0 +1,24 @@
+replicaCount: 2
+
+image:
+  repository: guyatu1627/cloud-native-ecommerce-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+env:
+  projectName: "Cloud-Native E-Commerce API"
+  version: "1.0.0"
+  apiV1Str: "/api/v1"

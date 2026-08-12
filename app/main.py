@@ -3,6 +3,8 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.core.config import settings
+from app.core.metrics import setup_metrics
+from app.core.logging import setup_logging, CorrelationIdMiddleware
 from app.api.v1.endpoints import auth, products, orders
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
@@ -36,6 +38,13 @@ limiter = Limiter(key_func=get_remote_address, storage_uri=settings.REDIS_URL)
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Initialize structured logging and correlation ID middleware
+setup_logging()
+app.add_middleware(CorrelationIdMiddleware)
+
+# Initialize Prometheus instrumentation
+setup_metrics(app)
 
 @app.get("/health", status_code=200)
 @limiter.limit("60/minute")
